@@ -16,7 +16,7 @@ float sensorInput;       // The time it takes for the sensor to recieve the sign
 int(offTime);
 int degX;
 int degY;
-int degChange = 20;
+int degChange = 40;
 
 
 //
@@ -27,9 +27,6 @@ void setup()
   //
   // start the serial port
   //
-  long baudRate = 9600;       // NOTE1: The baudRate for sending & receiving programs must match
-  Serial.begin(baudRate);     // NOTE2: Set the baudRate to 115200 for faster communication
-
   ServoX.attach(servoX);
   ServoY.attach(servoY);
   Serial.begin(9600);
@@ -43,17 +40,18 @@ void setup()
 
 void loop()
 {
-  
-  for (degX = 0; degX<= 180; degX = degX + degChange)
+  ServoX.write(0);
+  ServoY.write(0);
+  for (degX = 40; degX<= 180; degX = degX + degChange)
   {
   ServoX.write(degX); // Make servo go to 0 degrees 
   ServoY.write(0);
-  delay(100);
-  	for (degY = 0; degY<= 180; degY = degY + degChange)
+  delay(1000);
+  	for (degY = 40; degY<= 120; degY = degY + degChange)
     {
       ServoY.write(degY); // Make servo go to 0 degrees 
       read();
-      delay(100);
+      delay(1000);
     }
     
   
