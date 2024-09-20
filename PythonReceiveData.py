@@ -1,77 +1,45 @@
 #      ******************************************************************
 #      *                                                                *
+#      *    Receive data for a 3d scan from the Arduino                 *
 #      *                                                                *
-#      *    Example Python program that receives data from an Arduino   *
-#      *                                                                *
+#      *    Notes: The script was developed in python 3. The script uses "pyserial".
+#      *    While the script is running, the Arduino can not be re-programed.
+#      *    Exit this script before downloading a new Arduino sketch.
 #      *                                                                *
 #      ******************************************************************
 
 
 import serial
+import csv
 
-#
-# Note 1: This python script was designed to run with Python 3.
-#
-# Note 2: The script uses "pyserial" which must be installed.  If you have
-#         previously installed the "serial" package, it must be uninstalled
-#         first.
-#
-# Note 3: While this script is running you can not re-program the Arduino.
-#         Before downloading a new Arduino sketch, you must exit this
-#         script first.
-#
+arduinoComPort = "COM4"     # Serial port for the Arduino.
+baudRate = 9600             # Baud rate of the Arduino.
 
-
-#
-# Set the name of the serial port.  Determine the name as follows:
-#	1) From Arduino's "Tools" menu, select "Port"
-#	2) It will show you which Port is used to connect to the Arduino
-#
-# For Windows computers, the name is formatted like: "COM6"
-# For Apple computers, the name is formatted like: "/dev/tty.usbmodemfa141"
-#
-arduinoComPort = "COM4"
-
-
-#
-# Set the baud rate
-# NOTE1: The baudRate for the sending and receiving programs must be the same!
-# NOTE2: For faster communication, set the baudRate to 115200 below
-#        and check that the arduino sketch you are using is updated as well.
-#
-baudRate = 9600
-
-
-#
 # open the serial port
-#
 serialPort = serial.Serial(arduinoComPort, baudRate, timeout=1)
 
+fileName = "Scan_1.csv"     # Name of the file to save the data.
+dataFields = ["Distance", "Pan Angle", "Tilt angle"]
 
+with open(fileName, 'w') as csvfile:
+  csvWriter= csv.DictWriter(csvfile, fieldnames=dataFields)
+  csvWriter.writeheader()
 
-#
-# main loop to read data from the Arduino, then display it
-#
+# main loop to read data from the Arduino and write it in a JSON file.
 while True:
   #
-  # ask for a line of data from the serial port, the ".decode()" converts the
-  # data from an "array of bytes", to a string
+  # Read a line of data from the serial port, then convert it from an
+  # array of bytes to a string using ".decode()".
   #
   lineOfData = serialPort.readline().decode()
 
-  #
-  # check if data was received
-  #
-  if len(lineOfData) > 0:
-    #
-    # data was received, convert it into 4 integers
-    #
-    a, b, c, d = (int(x) for x in lineOfData.split(','))
+  if len(lineOfData) > 0:  # If data was received
+    sensor_distance, servo_pan_angle, servo_tilt_angle, = (int(x) for x in lineOfData.split(',')) # Convert it to 3 data integers
 
+    csvWriter.writerow({dataFields[0]: sensor_distance, dataFields[1]: servo_pan_angle, dataFields[2]: servo_tilt_angle})
     #
     # print the results
     #
-    print("a = " + str(a), end="")
-    print(", b = " + str(b), end="")
-    print(", c = " + str(c), end="")
-    print(", d = " + str(d))
+    print("Distance = " + str(sensor_distance), end="")
+    print(", Pan Angle = " + str(servo_pan_angle), end="")
+    print(", Tilt angle = " + str(servo_tilt_angle))
