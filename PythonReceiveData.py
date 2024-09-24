@@ -8,11 +8,11 @@
 #      *                                                                *
 #      ******************************************************************
 
-
+import gitignore
 import serial
 import csv
 
-arduinoComPort = "COM5"     # Serial port for the Arduino.
+arduinoComPort = gitignore.SerialPort     # Serial port for the Arduino.
 baudRate = 9600             # Baud rate of the Arduino.
 
 # open the serial port
