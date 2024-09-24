@@ -1,1 +1,1 @@
-SerialPort = ""
+SerialPort = "COM5"

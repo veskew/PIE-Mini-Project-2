@@ -16,7 +16,7 @@ int sensorInput;       // The time it takes for the sensor to recieve the signal
 int(offTime);
 int degX;
 int degY;
-int degChange = 40;
+int degChange = 2;
 
 
 //
@@ -46,16 +46,16 @@ void loop()
   {
   ServoX.write(degX); // Make servo go to 0 degrees 
   ServoY.write(0);
-  delay(1000);
-  	for (degY = 40; degY<= 120; degY = degY + degChange)
+  delay(10);
+  	for (degY = 40; degY<= 80; degY = degY + degChange)
     {
       ServoY.write(degY); // Make servo go to 0 degrees 
       read();
-      delay(1000);
+      delay(10);
     }
     
   
-  delay(100);
+  delay(10);
   }
    delay(offTime);
 }
