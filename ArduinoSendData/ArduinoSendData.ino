@@ -11,8 +11,8 @@ int servoY = 12; // Declare the Y servo pin
 Servo ServoX;        // Create a servo object 
 Servo ServoY;
 int sensorPin=A0;    // Declare the pins for the sensor input and output
-float distance;       // The distance measurements from the sensor
-float sensorInput;       // The time it takes for the sensor to recieve the signal it sends
+int distance;       // The distance measurements from the sensor
+int sensorInput;       // The time it takes for the sensor to recieve the signal it sends
 int(offTime);
 int degX;
 int degY;
@@ -65,7 +65,7 @@ void loop()
 void read()
 {
   sensorInput=analogRead(sensorPin);
-  distance=sensorInput;
+  distance=round(sensorInput);
   // debug();
   csv();
   delay(100);
@@ -73,12 +73,13 @@ void read()
 void csv()
 {
   // Code to print sensor values as they would be seen in a csv
-  Serial.print("\n");
   Serial.print(distance);
   Serial.print(",");
   Serial.print(degX);
   Serial.print(",");
-  Serial.print(degY);
+  Serial.println(degY);
+
+  delay(400);
 }
 void debug()
 {

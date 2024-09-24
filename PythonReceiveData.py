@@ -12,7 +12,7 @@
 import serial
 import csv
 
-arduinoComPort = "COM4"     # Serial port for the Arduino.
+arduinoComPort = "COM5"     # Serial port for the Arduino.
 baudRate = 9600             # Baud rate of the Arduino.
 
 # open the serial port
@@ -34,12 +34,16 @@ while True:
   lineOfData = serialPort.readline().decode()
 
   if len(lineOfData) > 0:  # If data was received
-    sensor_distance, servo_pan_angle, servo_tilt_angle, = (int(x) for x in lineOfData.split(',')) # Convert it to 3 data integers
+    print("*" + lineOfData)
+    sensor_distance, servo_pan_angle, servo_tilt_angle = (int(x) for x in lineOfData.split(',')) # Convert it to 3 data integers
 
-    csvWriter.writerow({dataFields[0]: sensor_distance, dataFields[1]: servo_pan_angle, dataFields[2]: servo_tilt_angle})
-    #
-    # print the results
-    #
+    with open(fileName, 'a') as csvfile:
+      csvWriter= csv.writer(csvfile)
+      csvWriter.writerow([sensor_distance, servo_pan_angle, servo_tilt_angle])
+      csvfile.close()
+    
+    """
     print("Distance = " + str(sensor_distance), end="")
     print(", Pan Angle = " + str(servo_pan_angle), end="")
     print(", Tilt angle = " + str(servo_tilt_angle))
+"""
