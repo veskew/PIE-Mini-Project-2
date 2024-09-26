@@ -47,18 +47,28 @@ void loop()
   ServoX.write(degX); // Make servo go to 0 degrees 
   ServoY.write(0);
   delay(10);
-  	for (degY = 40; degY<= 80; degY = degY + degChange)
+    if (degX % 4 == 0){
+  	for (degY = 10; degY<= 75; degY = degY + degChange)
     {
       ServoY.write(degY); // Make servo go to 0 degrees 
       read();
       delay(10);
     }
-    
+    }
+    else{
+    for (degY = 75; degY>= 10; degY = degY - degChange)
+    {
+      ServoY.write(degY); // Make servo go to 0 degrees 
+      read();
+      delay(10);
+    }
+    }
   
   delay(10);
   }
    delay(offTime);
 }
+
 
 
 
