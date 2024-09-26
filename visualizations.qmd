@@ -1,0 +1,163 @@
+---
+title: Dependencies
+jupyter: python3
+---
+
+
+
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+import pyvista as pv
+import csv
+import pandas as pd
+```
+
+# Callibration Process
+In order to callibrate the sensor, we need to place objects at varying distances from the sensor in the range 20-150 cm. We can then use the distance and voltage data to create a regression model that can be used to predict distance values from voltages outputted by the sensor. 
+
+### Linear Regression Model
+
+```{python}
+# Inputting data
+Distance_train = [20, 25, 30, 40, 45, 50, 60, 65, 70, 80, 85, 90, 95, 100]  # Distances chosen by me to train the model.
+Voltage_train = [492, 440, 385, 304, 266, 240, 199, 182, 171, 148, 138, 130, 124, 119]  # The corresponding output voltages.
+
+Distance_test = [35, 55, 75]
+Voltage_test = [338, 213, 155]
+# Convert lists to numpy arrays
+Distance_train = np.array(Distance_train)
+Voltage_train = np.array(Voltage_train)
+
+# Calculate the coefficients (slope and intercept)
+m, b = np.polyfit(Distance_train, Voltage_train, 1)
+
+# Create a line based on the slope and intercept
+line = m * Distance_train + b
+
+# Plot the original data points
+plt.scatter(Distance_train, Voltage_train, color='blue', label='Data Points')
+
+# Plot the line of best fit
+plt.plot(Distance_train, line, color='red', label='Line of Best Fit')
+
+# Add labels and a legend
+plt.xlabel('Distance from sensor (cm)')
+plt.ylabel('Sensor output')
+plt.title('Line of Best Fit')
+plt.legend()
+
+# Show the plot
+plt.show()
+```
+
+### Quadratic Regression Model
+
+```{python}
+# Inputting data
+Distance_train = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]  # Distances chosen by me to train the model.
+Voltage_train = [492, 440, 385, 338, 304, 266, 240, 213, 199, 182, 171, 155, 148, 138, 130, 124, 119]  # The corresponding output voltages.
+
+
+# Convert lists to numpy arrays
+Distance_train = np.array(Distance_train)
+Voltage_train = np.array(Voltage_train)
+
+# Calculate the coefficients (slope and intercept)
+a, b, c = np.polyfit(Voltage_train, Distance_train, 2)
+print(a)
+print(b)
+print(c)
+# Create a line based on the slope and intercept
+quadratic = a * Voltage_train * Voltage_train + b * Voltage_train + c
+print(quadratic)
+print(a * 482 * 482 + b * 482 + c)
+# Plot the original data points
+plt.scatter(Distance_train, Voltage_train, color='blue', label='Data Points')
+
+# Plot the line of best fit
+plt.plot(quadratic, Voltage_train, color='red', label='Line of Best Fit')
+
+# Add labels and a legend
+plt.xlabel('Distance from sensor (cm)')
+plt.ylabel('Sensor output')
+plt.title('Line of Best Fit')
+plt.legend()
+# Show the plot
+plt.show()
+```
+
+Code to create visualizations from data obtained from sensors.
+
+```{python}
+
+
+dataSource = 'Scan_1.csv'
+
+with open(dataSource, 'r') as file:
+    reader = csv.reader(file)
+    next(reader)
+    data = list(reader)
+
+data_array = np.array(data, dtype=float)
+
+sensor_output = data_array[:,0]
+theta1 = data_array[:,1] # Tilt angle (Servo2)
+theta2 = data_array[:,2] # Pan angle (Servo1)
+
+# Mathematical conversions
+
+# Convert angles from degrees to radians
+theta1 = theta1 * (np.pi/180)
+theta2 = theta2 * (np.pi/180)
+print(sensor_output)
+print("***********")
+print(a)
+print(b)
+print(c)
+print("*(************)")
+# Convert sensor outputs to distance (cm)
+distance = a * sensor_output * sensor_output + b * sensor_output + c
+print(distance)
+
+# Convert the coordinates from polar to cartesian
+Z_coordinates = np.multiply(distance, np.sin(theta1))
+Y_coordinates = np.multiply(np.multiply(distance, np.cos(theta1)), np.sin(theta2))
+X_coordinates = np.multiply(np.multiply(distance, np.cos(theta1)), np.cos(theta2))
+
+
+# Creating figure
+fig = plt.figure(figsize = (10, 7))
+ax = plt.axes(projection ="3d")
+#ax.set_xlim(-10,10)
+#ax.set_ylim(0,20)
+#ax.set_zlim(-10,10)
+ax.view_init(elev=20., azim=32)
+ 
+
+# Creating plot
+ax.scatter3D(X_coordinates, Y_coordinates, Z_coordinates, color = "green")
+plt.title("simple 3D scatter plot")
+ 
+
+ax.set_xlabel('X Label')
+ax.set_ylabel('Y Label')
+ax.set_zlabel('Z Label')
+# show plot
+plt.show()
+
+
+# Create good 3d plot
+pv.Plotter(window_size=[20, 20])
+all_coordinates = [X_coordinates, Y_coordinates, Z_coordinates]
+data_points = np.transpose(all_coordinates)
+
+
+# points is a 3D numpy array (n_points, 3) coordinates of a sphere
+cloud = pv.PolyData(data_points)
+
+surf = cloud.delaunay_2d()
+surf.plot(show_edges=True)
+
+```
+
